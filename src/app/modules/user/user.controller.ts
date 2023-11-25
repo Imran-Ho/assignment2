@@ -17,7 +17,7 @@ const createNewUser = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: 'user created successfully.',
+      message: 'Newly user created successfully.',
       data: output,
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -64,7 +64,7 @@ const getSingleUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(400).json({
       success: false,
-      message: 'User not found',
+      message: err.message || 'User not found',
       error: err,
     });
   }
