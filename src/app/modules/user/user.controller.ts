@@ -1,10 +1,19 @@
 import { Request, Response } from 'express';
 import { userService } from './user.service';
+import userValidationSchema from './user.joivalidation';
 
 const createNewUser = async (req: Request, res: Response) => {
   try {
     const { users: userData } = req.body;
+    const { error } = userValidationSchema.validate(userData);
     const output = await userService.makeUserDB(userData);
+    if (error) {
+      res.status(400).json({
+        success: false,
+        message: 'you may be wrong something.',
+        error: error.details,
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -13,7 +22,7 @@ const createNewUser = async (req: Request, res: Response) => {
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    res.status(500).json({
+    res.status(400).json({
       success: false,
       message: err.message || 'something went wrong',
       error: err,
