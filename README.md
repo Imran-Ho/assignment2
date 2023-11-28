@@ -1,9 +1,9 @@
 # Project Setup with
 
-Node.js
-npm
-Mongoose
-Joi (for data validation)
+- Node.js
+- npm
+- Mongoose
+- Joi (for data validation)
 
 1. Clone the respository :
 
