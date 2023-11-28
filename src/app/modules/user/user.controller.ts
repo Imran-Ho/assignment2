@@ -37,7 +37,7 @@ const createNewUser = async (req: Request, res: Response) => {
   }
 };
 
-// get exixting user
+// get existing user
 const getDBExistingUsers = async (req: Request, res: Response) => {
   try {
     const getExistingUser = await userService.getUsers();
@@ -153,7 +153,7 @@ const updatedUserInfo = async (req: Request, res: Response) => {
     });
   }
 };
-//Add New product to order
+//Add New product to order list of a user
 const NewProductAddedToOrder = async (req: Request, res: Response) => {
   try {
     const userId = Number(req.params.userId);
@@ -185,6 +185,69 @@ const NewProductAddedToOrder = async (req: Request, res: Response) => {
   }
 };
 
+//Retrieve orders list of users
+const GetOrdersOfAUser = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+    if (await User.isUserExists(userId)) {
+      const result = await userService.GetUsersOrderFromDB(userId);
+      res.status(200).json({
+        success: true,
+        message: 'Order loaded successfully!',
+        data: result,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message:
+        (error as Error).message ||
+        'Failed to get all orders of a specific user  !',
+      error: error,
+    });
+  }
+};
+
+//Total Price Calculation of Orders of a User
+const CalculateTotalPriceOfOrders = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+    if (await User.isUserExists(userId)) {
+      const result =
+        await userService.CalculateTotalPriceOfOrderOfASpecificUserToDB(userId);
+      res.status(200).json({
+        success: true,
+        message: 'Total price calculated successfully!',
+        data: result,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: (error as Error).message || 'Failed to calclulate total price !',
+      error: error,
+    });
+  }
+};
+
 export const userController = {
   createNewUser,
   getDBExistingUsers,
@@ -192,4 +255,6 @@ export const userController = {
   deleteSingleUser,
   updatedUserInfo,
   NewProductAddedToOrder,
+  GetOrdersOfAUser,
+  CalculateTotalPriceOfOrders,
 };

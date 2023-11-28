@@ -89,7 +89,6 @@ userSchema.post('save', function (data, next) {
   next();
 });
 
-// query middleware
 userSchema.pre('find', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
@@ -103,7 +102,7 @@ userSchema.pre('aggregate', function (next) {
   next();
 });
 
-// static method
+// for static method
 userSchema.statics.isUserExists = async function (userId: number) {
   const existingUser = await User.findOne({ userId });
   return existingUser;

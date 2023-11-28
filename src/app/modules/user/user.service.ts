@@ -15,7 +15,7 @@ const makeUserDB = async (userData: TUser) => {
   return userResult;
 };
 
-// get users
+// get users from DB
 const getUsers = async () => {
   const getDBUsers = await User.find().select([
     'userId',
@@ -62,7 +62,7 @@ const updatedUserInfo = async (userId: number, updatedInfo: any) => {
   return result;
 };
 
-//Add new product to order
+//Add new product of a user in order list
 const NewPrdouctAddedToOrderDB = async (
   userId: number,
   orderInfo: TUserOrder,
@@ -82,6 +82,46 @@ const NewPrdouctAddedToOrderDB = async (
   return result;
 };
 
+//Retrieve orders list of a user
+const GetUsersOrderFromDB = async (userId: number) => {
+  const result = await User.findOne({ userId: userId }).select([
+    '-_id',
+    'orders',
+  ]);
+  return result;
+};
+
+//Total Price calculation of Orders of a User
+const CalculateTotalPriceOfOrderOfASpecificUserToDB = async (
+  userId: number,
+) => {
+  const result = await User.aggregate([
+    {
+      $match: {
+        userId: userId,
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalPrice: {
+          $reduce: {
+            input: '$orders',
+            initialValue: 0,
+            in: {
+              $add: [
+                '$$value',
+                { $multiply: ['$$this.price', '$$this.quantity'] },
+              ],
+            },
+          },
+        },
+      },
+    },
+  ]);
+  return result;
+};
+
 export const userService = {
   makeUserDB,
   getUsers,
@@ -89,4 +129,6 @@ export const userService = {
   deleteSingleUser,
   updatedUserInfo,
   NewPrdouctAddedToOrderDB,
+  GetUsersOrderFromDB,
+  CalculateTotalPriceOfOrderOfASpecificUserToDB,
 };
