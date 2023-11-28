@@ -9,6 +9,12 @@ export type TAddress = {
   city: string;
   country: string;
 };
+export type TUserOrder = {
+  productName: string;
+  price: number;
+  quantity: number;
+};
+
 export type TUser = {
   userId: number;
   username: string;
@@ -17,11 +23,13 @@ export type TUser = {
   age: number;
   email: string;
   isActive: boolean;
-  hobbies: 'fishing' | 'traveling';
+  hobbies?: string[];
   address: TAddress;
+  orders?: TUserOrder[];
+  isDeleted: boolean;
 };
 
-// for using static
+// for using static method
 export interface UserModel extends Model<TUser> {
-  isUserExists(id: number): Promise<TUser | null>;
+  isUserExists(userId: number): Promise<TUser | null>;
 }

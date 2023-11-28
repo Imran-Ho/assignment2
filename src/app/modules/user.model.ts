@@ -3,7 +3,7 @@ import {
   TAddress,
   TFullName,
   TUser,
-  UserMethods,
+  TUserOrder,
   UserModel,
 } from './user/user.interface';
 import bcrypt from 'bcrypt';
@@ -26,6 +26,27 @@ const addressSchema = new Schema<TAddress>({
   country: { type: String },
 });
 
+const UserOrdersSchema = new Schema<TUserOrder>(
+  {
+    productName: {
+      type: String,
+      trim: true,
+      required: [true, 'ProductName is require'],
+    },
+    price: {
+      type: Number,
+      trim: true,
+      required: [true, 'Price is require'],
+    },
+    quantity: {
+      type: Number,
+      trim: true,
+      required: [true, 'Quantity is require'],
+    },
+  },
+  { _id: false },
+);
+
 const userSchema = new Schema<TUser, UserModel>({
   userId: { type: Number, required: true, unique: true, trim: true },
   username: {
@@ -46,13 +67,20 @@ const userSchema = new Schema<TUser, UserModel>({
   },
   isActive: { type: Boolean },
   hobbies: {
-    type: String,
-    enum: ['fishing', 'traveling'],
+    type: [String],
+    trim: true,
+    required: [true, 'hobbies is required'],
   },
   address: { type: addressSchema },
+  orders: [UserOrdersSchema],
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 // middleware/hooks
 userSchema.pre('save', async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
   user.password = await bcrypt.hash(
     user.password,
@@ -60,7 +88,24 @@ userSchema.pre('save', async function (next) {
   );
   next();
 });
-userSchema.post('save', function () {});
+userSchema.post('save', function (data, next) {
+  data.password = '';
+  next();
+});
+
+// query middleware
+userSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+userSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+userSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
+});
 
 // static method
 userSchema.statics.isUserExists = async function (userId: number) {

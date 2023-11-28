@@ -1,12 +1,19 @@
 import { Request, Response } from 'express';
 import { userService } from './user.service';
-import userValidationSchema from './user.joivalidation';
+
+import { User } from '../user.model';
+
+import {
+  updateInfoValidation,
+  userValidationSchema,
+} from './user.joivalidation';
 
 const createNewUser = async (req: Request, res: Response) => {
   try {
     const { users: userData } = req.body;
     const { error } = userValidationSchema.validate(userData);
     const output = await userService.makeUserDB(userData);
+    // const { username, fullName, age, email, address } = output;
     if (error) {
       res.status(400).json({
         success: false,
@@ -17,7 +24,7 @@ const createNewUser = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: 'Newly user created successfully.',
+      message: 'user created successfully.',
       data: output,
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,14 +59,91 @@ const getDBExistingUsers = async (req: Request, res: Response) => {
 // find single user
 const getSingleUser = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
-    const getSingleUser = await userService.findSingleUser(userId);
-
-    res.status(200).json({
-      success: true,
-      message: 'user is found successfully.',
-      data: getSingleUser,
+    const userId = Number(req.params.userId);
+    if (await User.isUserExists(userId)) {
+      const getSingleUser = await userService.findSingleUser(userId);
+      res.status(200).json({
+        success: true,
+        message: 'user is found successfully.',
+        data: getSingleUser,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      message: err.message || 'User not found',
+      error: err,
     });
+  }
+};
+const deleteSingleUser = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+    if (await User.isUserExists(userId)) {
+      await userService.deleteSingleUser(userId);
+
+      res.status(200).json({
+        success: true,
+        message: 'user is deleted successfully.',
+        data: null,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      message: err.message || 'User not found',
+      error: err,
+    });
+  }
+};
+
+const updatedUserInfo = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+    const updateInfo = req.body;
+
+    if (await User.isUserExists(userId)) {
+      const validateData = updateInfoValidation.validate(updateInfo);
+
+      const result = await userService.updatedUserInfo(
+        userId,
+        validateData.value,
+      );
+      res.status(200).json({
+        success: true,
+        message: 'User updated successfully!',
+        data: result,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     res.status(400).json({
@@ -74,4 +158,6 @@ export const userController = {
   createNewUser,
   getDBExistingUsers,
   getSingleUser,
+  deleteSingleUser,
+  updatedUserInfo,
 };
