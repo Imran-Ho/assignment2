@@ -10,11 +10,8 @@ app.use(cors());
 // application routes
 app.use('/api/users', userRoutes);
 
-const getController = (req: Request, res: Response) => {
-  const a = 10;
-  res.send(a);
-};
-
-app.get('/', getController);
+app.get('/', (req, res) => {
+  res.send('project number 2');
+});
 
 export default app;
