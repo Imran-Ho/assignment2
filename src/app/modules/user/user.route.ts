@@ -10,4 +10,6 @@ router.put('/:userId', userController.updatedUserInfo);
 router.get('/:userId', userController.getSingleUser);
 router.delete('/:userId', userController.deleteSingleUser);
 
+//orders api
+router.put('/:userId/orders', userController.NewProductAddedToOrder);
 export const userRoutes = router;

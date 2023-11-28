@@ -37,7 +37,7 @@ const createNewUser = async (req: Request, res: Response) => {
   }
 };
 
-// get user
+// get exixting user
 const getDBExistingUsers = async (req: Request, res: Response) => {
   try {
     const getExistingUser = await userService.getUsers();
@@ -153,6 +153,37 @@ const updatedUserInfo = async (req: Request, res: Response) => {
     });
   }
 };
+//Add New product to order
+const NewProductAddedToOrder = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+    const orderInfo = req.body;
+    if (await User.isUserExists(userId)) {
+      await userService.NewPrdouctAddedToOrderDB(userId, orderInfo);
+      res.status(200).json({
+        success: true,
+        message: 'Order created successfully!',
+        data: null,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message:
+        (error as Error).message || 'Failed to add new product to orders !',
+      error: error,
+    });
+  }
+};
 
 export const userController = {
   createNewUser,
@@ -160,4 +191,5 @@ export const userController = {
   getSingleUser,
   deleteSingleUser,
   updatedUserInfo,
+  NewProductAddedToOrder,
 };

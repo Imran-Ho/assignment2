@@ -23,13 +23,13 @@ export type TUser = {
   age: number;
   email: string;
   isActive: boolean;
-  hobbies?: string[];
+  hobbies: string[];
   address: TAddress;
   orders?: TUserOrder[];
-  isDeleted: boolean;
 };
 
 // for using static method
 export interface UserModel extends Model<TUser> {
+  // eslint-disable-next-line no-unused-vars
   isUserExists(userId: number): Promise<TUser | null>;
 }

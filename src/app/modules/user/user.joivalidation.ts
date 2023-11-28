@@ -19,9 +19,9 @@ const addressValidationSchema = Joi.object({
   country: Joi.string(),
 });
 const orderValidationSchema = Joi.object({
-  productName: Joi.string(),
-  price: Joi.number(),
-  quantity: Joi.number(),
+  productName: Joi.string().optional(),
+  price: Joi.number().optional(),
+  quantity: Joi.number().optional(),
 });
 
 export const userValidationSchema = Joi.object({
@@ -35,7 +35,6 @@ export const userValidationSchema = Joi.object({
   hobbies: Joi.array().items(Joi.string()),
   address: addressValidationSchema,
   orders: Joi.array().items(orderValidationSchema).optional(),
-  isDeleted: Joi.boolean(),
 });
 
 export const updateInfoValidation = Joi.object({
@@ -52,5 +51,4 @@ export const updateInfoValidation = Joi.object({
   hobbies: Joi.array().items(Joi.string()).optional(),
   address: addressValidationSchema.optional(),
   orders: Joi.array().items(orderValidationSchema).optional(),
-  isDeleted: Joi.boolean().optional(),
 });

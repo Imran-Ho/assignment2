@@ -73,10 +73,6 @@ const userSchema = new Schema<TUser, UserModel>({
   },
   address: { type: addressSchema },
   orders: [UserOrdersSchema],
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
 });
 // middleware/hooks
 userSchema.pre('save', async function (next) {
