@@ -10,9 +10,8 @@ import {
 
 const createNewUser = async (req: Request, res: Response) => {
   try {
-    const { users: userData } = req.body;
-    const { error } = userValidationSchema.validate(userData);
-    const output = await userService.makeUserDB(userData);
+    const { error } = userValidationSchema.validate(req.body);
+    const output = await userService.makeUserDB(req.body);
     // const { username, fullName, age, email, address } = output;
     if (error) {
       res.status(400).json({
